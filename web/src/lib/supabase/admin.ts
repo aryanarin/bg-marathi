@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
+import type { Database } from "@/lib/database.types";
 import { env, getServiceRoleKey } from "@/lib/env";
 
 /**
@@ -19,7 +20,7 @@ import { env, getServiceRoleKey } from "@/lib/env";
  * into client code a build error.
  */
 export function createAdminClient() {
-  return createSupabaseClient(env.NEXT_PUBLIC_SUPABASE_URL, getServiceRoleKey(), {
+  return createSupabaseClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, getServiceRoleKey(), {
     auth: {
       // No session persistence or refresh: this client is stateless and
       // request-scoped, never tied to a browser session.

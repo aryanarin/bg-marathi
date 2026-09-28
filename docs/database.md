@@ -26,18 +26,38 @@ Order matters because of dependencies:
 
 | File                              | Contents                                  |
 | --------------------------------- | ----------------------------------------- |
-| `0001_extensions_and_helpers.sql` | Extensions, `set_updated_at()`, `is_admin()` |
-| `0002_profiles.sql`               | `profiles` + signup trigger               |
+| `0001_extensions_and_helpers.sql` | Extensions, `set_updated_at()`            |
+| `0002_profiles.sql`               | `profiles`, `is_admin()`, signup + role-guard triggers |
 | `0003_content.sql`                | `chapters`, `verses`                      |
 | `0004_progress.sql`               | `verse_progress`, `reading_sessions`      |
 | `0005_classes.sql`                | `classes`                                 |
 | `0006_quizzes.sql`                | `quizzes`, `quiz_questions`, `quiz_attempts`, `quiz_answers` |
 | `0007_rls_policies.sql`           | All RLS policies and column grants        |
 | `0008_functions.sql`              | `submit_quiz_attempt()`, progress helpers |
+| `0009_fix_anon_quiz_grants.sql`   | Revoke `anon` base grants on private tables (security fix) |
+
+`is_admin()` lives in `0002`, not `0001`, because a SQL function's body is
+validated against existing objects at creation time and it references
+`public.profiles`. This ordering matters: an earlier draft defined it in `0001`
+and the migration failed with "relation public.profiles does not exist".
 
 RLS is enabled per table in the table's own migration, so a table is never
 readable before its policies exist. Policies themselves are grouped in `0007`
 so the whole access model can be read in one file.
+
+### Applying migrations
+
+`web/scripts/migrate.ts` (`npm run db:migrate`) applies pending migrations over
+the pooled Postgres connection in `SUPABASE_DB_URL`, tracking applied files in a
+`schema_migrations` table. Each file runs in a transaction, so a failure rolls
+back cleanly with nothing half-applied. `npm run db:migrate -- --status` lists
+applied vs pending. Migrations can equally be pasted into the Supabase SQL
+Editor by hand; the runner is a convenience, not a requirement.
+
+> **Note on the Supabase pooler.** The direct `db.<ref>.supabase.co` host is
+> IPv6-only and may not resolve on all networks. Use the pooler host
+> (`aws-0-<region>.pooler.supabase.com`, user `postgres.<ref>`) in
+> `SUPABASE_DB_URL`, which is IPv4.
 
 ## Tables
 
@@ -91,6 +111,7 @@ depending on the edition), so this must not be a hard-coded constant.
 | `id`               | uuid PK     |                                         |
 | `chapter_id`       | uuid        | not null, FK → `chapters(id)` `on delete cascade` |
 | `verse_number`     | integer     | not null, check > 0                     |
+| `verse_number_end` | integer     | nullable, check ≥ `verse_number`        |
 | `sanskrit_text`    | text        | not null                                |
 | `word_to_word`     | text        | nullable                                |
 | `translation`      | text        | nullable                                |
@@ -104,6 +125,14 @@ depending on the edition), so this must not be a hard-coded constant.
 | `updated_at`       | timestamptz |                                         |
 
 **Unique:** `(chapter_id, verse_number)`.
+
+**Combined verses.** *Bhagavad-gītā As It Is* groups some verses into a single
+text — 1.16–18, 1.21–22, 2.42–43, and so on — and the recitation audio treats
+each group as one track. `verse_number_end` captures this: it is null for a
+single verse and set to the last number of a range for a combined entry. The UI
+shows "श्लोक ५" for a single verse and "श्लोक १६–१८" for a range; ordering always
+uses `verse_number`. This was confirmed against the audio set, whose 657 files
+across 18 chapters use exactly these groupings (filenames like `Bg-01-16-18.mp3`).
 
 `easy_explanation` and `example` are nullable because the administrator writes
 them by hand, after import. The application never generates them.
@@ -442,6 +471,17 @@ explanations through that function's output rather than by selecting the column.
 
 The `PublicQuizQuestion` TypeScript type mirrors this grant, so the type system
 and the database agree on what a learner may see.
+
+> **The `anon` role is separate, and this bit us.** `revoke ... from
+> authenticated` locks down signed-in users but leaves the `anon` role with
+> Supabase's default full-table grant — including `correct_option`. The live
+> RLS test in `web/tests/integration/rls.test.ts` caught the answer key being
+> readable by an unauthenticated client. Migration `0009_fix_anon_quiz_grants`
+> fixes it by revoking `anon`'s base grants on `quiz_questions`, `quiz_attempts`,
+> `quiz_answers`, `verse_progress`, `reading_sessions` and `profiles` entirely:
+> these are all signed-in features, so `anon` needs no access. The lesson,
+> written into the test as a permanent guard: after tightening a grant for one
+> role, verify the *other* roles too.
 
 ### Making a submitted attempt immutable
 
