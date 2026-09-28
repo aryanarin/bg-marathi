@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { RegisterForm } from "@/components/auth/register-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
@@ -9,9 +10,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/**
- * PHASE 1: shell only. Registration is implemented in Phase 3.
- */
 export default function RegisterPage() {
   return (
     <Card>
@@ -19,15 +17,11 @@ export default function RegisterPage() {
         <CardTitle as="h1" className="font-devanagari text-2xl">
           नोंदणी करा
         </CardTitle>
-        <CardDescription>
-          खाते तयार केल्यावर आपली प्रगती नोंदवली जाईल.
-        </CardDescription>
+        <CardDescription>खाते तयार केल्यावर आपली प्रगती नोंदवली जाईल.</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <p className="rounded border border-dashed border-rule-gold bg-sand/50 p-4 text-sm text-ink-muted">
-          नोंदणी सुविधा तयार होत आहे.
-        </p>
+        <RegisterForm />
 
         <p className="text-sm text-ink-muted">
           खाते आहे?{" "}

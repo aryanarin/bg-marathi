@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { LoginForm } from "@/components/auth/login-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
@@ -9,13 +10,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/**
- * PHASE 1: shell only.
- *
- * The sign-in form, Supabase auth call and error handling arrive in Phase 3.
- * The route exists now so navigation and `typedRoutes` are correct.
- */
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: PageProps<"/login">) {
+  const params = await searchParams;
+  const next = typeof params.next === "string" ? params.next : undefined;
+  const linkError = params.error === "link_invalid";
+
   return (
     <Card>
       <CardHeader>
@@ -26,9 +27,13 @@ export default function LoginPage() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <p className="rounded border border-dashed border-rule-gold bg-sand/50 p-4 text-sm text-ink-muted">
-          प्रवेश सुविधा तयार होत आहे.
-        </p>
+        {linkError && (
+          <p className="rounded border border-danger bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+            दुवा कालबाह्य किंवा अवैध आहे. कृपया पुन्हा प्रयत्न करा.
+          </p>
+        )}
+
+        <LoginForm next={next} />
 
         <p className="text-sm text-ink-muted">
           खाते नाही?{" "}

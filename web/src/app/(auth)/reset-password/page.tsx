@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
@@ -9,11 +10,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * PHASE 1: shell only.
- *
- * In Phase 3 this page is reached from the emailed recovery link. Supabase
- * establishes a short-lived recovery session from the URL fragment, so the page
- * must be a Client Component that reads it and then calls updateUser().
+ * Reached from the emailed recovery link, which first hits /auth/callback to
+ * establish a recovery session, then redirects here. updatePassword() then
+ * works against that session.
  */
 export default function ResetPasswordPage() {
   return (
@@ -26,9 +25,7 @@ export default function ResetPasswordPage() {
       </CardHeader>
 
       <CardContent>
-        <p className="rounded border border-dashed border-rule-gold bg-sand/50 p-4 text-sm text-ink-muted">
-          ही सुविधा तयार होत आहे.
-        </p>
+        <ResetPasswordForm />
       </CardContent>
     </Card>
   );

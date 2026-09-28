@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
@@ -9,7 +10,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** PHASE 1: shell only. Implemented in Phase 3. */
 export default function ForgotPasswordPage() {
   return (
     <Card>
@@ -23,15 +23,10 @@ export default function ForgotPasswordPage() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <p className="rounded border border-dashed border-rule-gold bg-sand/50 p-4 text-sm text-ink-muted">
-          ही सुविधा तयार होत आहे.
-        </p>
+        <ForgotPasswordForm />
 
         <p className="text-sm text-ink-muted">
-          <Link
-            href="/login"
-            className="rounded font-medium text-saffron underline underline-offset-4"
-          >
+          <Link href="/login" className="rounded font-medium text-saffron underline underline-offset-4">
             प्रवेश पानाकडे परत जा
           </Link>
         </p>
