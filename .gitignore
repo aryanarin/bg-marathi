@@ -1,0 +1,70 @@
+# ---------------------------------------------------------------------------
+# Repository-level ignores
+#
+# The Next.js application has its own web/.gitignore. This file covers the
+# repository root, including the reference material that predates the project.
+# ---------------------------------------------------------------------------
+
+# --- Secrets ---------------------------------------------------------------
+# Belt and braces: web/.gitignore already covers these, but a service-role key
+# in Git history is a rotate-everything event, so the rule is repeated here.
+.env
+.env.*
+!.env.example
+
+# --- Dependencies and build output -----------------------------------------
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# --- Test output -----------------------------------------------------------
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# --- Editor and OS ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# --- Vercel ----------------------------------------------------------------
+.vercel
+
+# ---------------------------------------------------------------------------
+# Reference material (NOT part of the application)
+#
+# The earlier Cordova/Stitch Android prototype, design exports, screenshots and
+# the requirements PDF. Kept on disk for reference but deliberately untracked:
+# the prototype alone carries a full Android build tree and node_modules, and
+# the PDFs are third-party copyrighted material.
+#
+# Content extracted from these sources goes into content/ as validated JSON.
+# ---------------------------------------------------------------------------
+BhagavadGitaApp/
+bhagavad_gita_emblem/
+bhagavad_gita_study_app/
+reverent_dignified_devotional_portrait_painting_of_a._c._bhaktivedanta_swami/
+sacred_illuminated_marathi_gita/
+warm_serene_portrait_avatar_of_an_indian_devotee_in_traditional_saffron_tilak/
+whatsapp_image_2026_09_18_at_7.14.55_pm.jpeg/
+_1/
+_2/
+_3/
+_4/
+
+# Loose analysis scripts from the earlier audio-extraction attempt.
+*.py
+download_fonts.js
+test_node.js
+vedabase_audio_analysis.txt
+
+# Third-party copyrighted source texts.
+*.pdf
