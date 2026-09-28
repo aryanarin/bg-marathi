@@ -1,0 +1,2 @@
+failed to parse connection string: %DBURL%
+Try rerunning the command with --debug to troubleshoot the error.

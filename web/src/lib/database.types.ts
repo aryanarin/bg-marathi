@@ -1,312 +1,652 @@
 /**
- * Database types.
+ * Database types — GENERATED from the live schema.
  *
- * These mirror the schema in supabase/migrations, expressed in the shape the
- * Supabase client expects (`Database['public']['Tables'][T]['Row' | 'Insert' |
- * 'Update']`). They are hand-authored to match the applied migrations rather
- * than generated, because generating requires a Supabase dashboard access token
- * (`supabase login`) that the API keys alone do not provide.
+ * Regenerate after any migration:
+ *   node scripts/gen-types.mjs
+ * which runs `supabase gen types typescript --db-url $SUPABASE_DB_URL --schema public`.
  *
- * If the schema changes, update this file in the same commit as the migration.
- * The single source of truth for the schema is supabase/migrations; this file
- * must agree with it.
+ * Do not hand-edit. Semantic enum unions (UserRole, QuizOption, ...) live in
+ * lib/types.ts, layered on top of these. Enum-like text columns surface here as
+ * plain string, which the app narrows via those unions.
  */
 
-type Timestamp = string;
-type Uuid = string;
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export type UserRole = "user" | "admin";
-export type MeetingPlatform = "google_meet" | "zoom" | "other";
-export type AudioProvider = "supabase_storage" | "google_drive" | "external";
-export type QuizOption = "a" | "b" | "c" | "d";
-
-export interface Database {
+export type Database = {
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: Uuid;
-          email: string;
-          full_name: string | null;
-          avatar_url: string | null;
-          role: UserRole;
-          created_at: Timestamp;
-          updated_at: Timestamp;
-        };
-        Insert: {
-          id: Uuid;
-          email: string;
-          full_name?: string | null;
-          avatar_url?: string | null;
-          role?: UserRole;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
-        };
-        // A learner can only update full_name and avatar_url (column grants).
-        Update: {
-          full_name?: string | null;
-          avatar_url?: string | null;
-        };
-      };
       chapters: {
         Row: {
-          id: Uuid;
           chapter_number: number;
-          name_sanskrit: string;
-          name_marathi: string;
+          created_at: string;
           description: string | null;
-          total_verses: number;
           display_order: number;
-          created_at: Timestamp;
-          updated_at: Timestamp;
-        };
-        Insert: {
-          id?: Uuid;
-          chapter_number: number;
-          name_sanskrit: string;
+          id: string;
           name_marathi: string;
-          description?: string | null;
+          name_sanskrit: string;
           total_verses: number;
-          display_order: number;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
-        };
-        Update: Partial<Database["public"]["Tables"]["chapters"]["Insert"]>;
-      };
-      verses: {
-        Row: {
-          id: Uuid;
-          chapter_id: Uuid;
-          verse_number: number;
-          verse_number_end: number | null;
-          sanskrit_text: string;
-          word_to_word: string | null;
-          translation: string | null;
-          purport: string | null;
-          easy_explanation: string | null;
-          example: string | null;
-          audio_url: string | null;
-          audio_provider: AudioProvider | null;
-          display_order: number;
-          created_at: Timestamp;
-          updated_at: Timestamp;
+          updated_at: string;
         };
         Insert: {
-          id?: Uuid;
-          chapter_id: Uuid;
-          verse_number: number;
-          verse_number_end?: number | null;
-          sanskrit_text: string;
-          word_to_word?: string | null;
-          translation?: string | null;
-          purport?: string | null;
-          easy_explanation?: string | null;
-          example?: string | null;
-          audio_url?: string | null;
-          audio_provider?: AudioProvider | null;
+          chapter_number: number;
+          created_at?: string;
+          description?: string | null;
           display_order: number;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
+          id?: string;
+          name_marathi: string;
+          name_sanskrit: string;
+          total_verses: number;
+          updated_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["verses"]["Insert"]>;
-      };
-      verse_progress: {
-        Row: {
-          id: Uuid;
-          user_id: Uuid;
-          verse_id: Uuid;
-          is_read: boolean;
-          is_memorized: boolean;
-          read_at: Timestamp | null;
-          memorized_at: Timestamp | null;
-          total_time_seconds: number;
-          created_at: Timestamp;
-          updated_at: Timestamp;
+        Update: {
+          chapter_number?: number;
+          created_at?: string;
+          description?: string | null;
+          display_order?: number;
+          id?: string;
+          name_marathi?: string;
+          name_sanskrit?: string;
+          total_verses?: number;
+          updated_at?: string;
         };
-        Insert: {
-          id?: Uuid;
-          user_id: Uuid;
-          verse_id: Uuid;
-          is_read?: boolean;
-          is_memorized?: boolean;
-          read_at?: Timestamp | null;
-          memorized_at?: Timestamp | null;
-          total_time_seconds?: number;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
-        };
-        Update: Partial<Database["public"]["Tables"]["verse_progress"]["Insert"]>;
-      };
-      reading_sessions: {
-        Row: {
-          id: Uuid;
-          user_id: Uuid;
-          verse_id: Uuid;
-          started_at: Timestamp;
-          ended_at: Timestamp;
-          duration_seconds: number;
-          created_at: Timestamp;
-        };
-        Insert: {
-          id?: Uuid;
-          user_id: Uuid;
-          verse_id: Uuid;
-          started_at: Timestamp;
-          ended_at: Timestamp;
-          duration_seconds: number;
-          created_at?: Timestamp;
-        };
-        Update: Partial<Database["public"]["Tables"]["reading_sessions"]["Insert"]>;
+        Relationships: [];
       };
       classes: {
         Row: {
-          id: Uuid;
-          title: string;
-          description: string | null;
           class_date: string;
           class_time: string;
-          meeting_platform: MeetingPlatform;
-          meeting_url: string;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          id: string;
           is_published: boolean;
-          created_by: Uuid | null;
-          created_at: Timestamp;
-          updated_at: Timestamp;
+          meeting_platform: string;
+          meeting_url: string;
+          title: string;
+          updated_at: string;
         };
         Insert: {
-          id?: Uuid;
-          title: string;
-          description?: string | null;
           class_date: string;
           class_time: string;
-          meeting_platform: MeetingPlatform;
-          meeting_url: string;
-          is_published?: boolean;
-          created_by?: Uuid | null;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
-        };
-        Update: Partial<Database["public"]["Tables"]["classes"]["Insert"]>;
-      };
-      quizzes: {
-        Row: {
-          id: Uuid;
-          title: string;
-          description: string | null;
-          chapter_id: Uuid | null;
-          verse_start: number | null;
-          verse_end: number | null;
-          is_published: boolean;
-          created_by: Uuid | null;
-          created_at: Timestamp;
-          updated_at: Timestamp;
-        };
-        Insert: {
-          id?: Uuid;
-          title: string;
+          created_at?: string;
+          created_by?: string | null;
           description?: string | null;
-          chapter_id?: Uuid | null;
-          verse_start?: number | null;
-          verse_end?: number | null;
+          id?: string;
           is_published?: boolean;
-          created_by?: Uuid | null;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
+          meeting_platform: string;
+          meeting_url: string;
+          title: string;
+          updated_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["quizzes"]["Insert"]>;
+        Update: {
+          class_date?: string;
+          class_time?: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_published?: boolean;
+          meeting_platform?: string;
+          meeting_url?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "classes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
-      quiz_questions: {
+      profiles: {
         Row: {
-          id: Uuid;
-          quiz_id: Uuid;
-          question: string;
-          option_a: string;
-          option_b: string;
-          option_c: string;
-          option_d: string;
-          correct_option: QuizOption;
-          explanation: string | null;
-          display_order: number;
-          created_at: Timestamp;
-          updated_at: Timestamp;
+          avatar_url: string | null;
+          created_at: string;
+          email: string;
+          full_name: string | null;
+          id: string;
+          role: string;
+          updated_at: string;
         };
         Insert: {
-          id?: Uuid;
-          quiz_id: Uuid;
-          question: string;
-          option_a: string;
-          option_b: string;
-          option_c: string;
-          option_d: string;
-          correct_option: QuizOption;
-          explanation?: string | null;
-          display_order: number;
-          created_at?: Timestamp;
-          updated_at?: Timestamp;
+          avatar_url?: string | null;
+          created_at?: string;
+          email: string;
+          full_name?: string | null;
+          id: string;
+          role?: string;
+          updated_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["quiz_questions"]["Insert"]>;
-      };
-      quiz_attempts: {
-        Row: {
-          id: Uuid;
-          quiz_id: Uuid;
-          user_id: Uuid;
-          score: number;
-          total_questions: number;
-          started_at: Timestamp;
-          completed_at: Timestamp | null;
+        Update: {
+          avatar_url?: string | null;
+          created_at?: string;
+          email?: string;
+          full_name?: string | null;
+          id?: string;
+          role?: string;
+          updated_at?: string;
         };
-        Insert: {
-          id?: Uuid;
-          quiz_id: Uuid;
-          user_id: Uuid;
-          score?: number;
-          total_questions: number;
-          started_at?: Timestamp;
-          completed_at?: Timestamp | null;
-        };
-        Update: Partial<Database["public"]["Tables"]["quiz_attempts"]["Insert"]>;
+        Relationships: [];
       };
       quiz_answers: {
         Row: {
-          id: Uuid;
-          attempt_id: Uuid;
-          question_id: Uuid;
-          selected_option: QuizOption | null;
+          attempt_id: string;
+          id: string;
           is_correct: boolean;
+          question_id: string;
+          selected_option: string | null;
         };
         Insert: {
-          id?: Uuid;
-          attempt_id: Uuid;
-          question_id: Uuid;
-          selected_option?: QuizOption | null;
+          attempt_id: string;
+          id?: string;
           is_correct?: boolean;
+          question_id: string;
+          selected_option?: string | null;
         };
-        Update: Partial<Database["public"]["Tables"]["quiz_answers"]["Insert"]>;
+        Update: {
+          attempt_id?: string;
+          id?: string;
+          is_correct?: boolean;
+          question_id?: string;
+          selected_option?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quiz_answers_attempt_id_fkey";
+            columns: ["attempt_id"];
+            isOneToOne: false;
+            referencedRelation: "quiz_attempts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quiz_answers_question_id_fkey";
+            columns: ["question_id"];
+            isOneToOne: false;
+            referencedRelation: "quiz_questions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quiz_attempts: {
+        Row: {
+          completed_at: string | null;
+          id: string;
+          quiz_id: string;
+          score: number;
+          started_at: string;
+          total_questions: number;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          id?: string;
+          quiz_id: string;
+          score?: number;
+          started_at?: string;
+          total_questions: number;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          id?: string;
+          quiz_id?: string;
+          score?: number;
+          started_at?: string;
+          total_questions?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey";
+            columns: ["quiz_id"];
+            isOneToOne: false;
+            referencedRelation: "quizzes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quiz_attempts_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quiz_questions: {
+        Row: {
+          correct_option: string;
+          created_at: string;
+          display_order: number;
+          explanation: string | null;
+          id: string;
+          option_a: string;
+          option_b: string;
+          option_c: string;
+          option_d: string;
+          question: string;
+          quiz_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          correct_option: string;
+          created_at?: string;
+          display_order: number;
+          explanation?: string | null;
+          id?: string;
+          option_a: string;
+          option_b: string;
+          option_c: string;
+          option_d: string;
+          question: string;
+          quiz_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          correct_option?: string;
+          created_at?: string;
+          display_order?: number;
+          explanation?: string | null;
+          id?: string;
+          option_a?: string;
+          option_b?: string;
+          option_c?: string;
+          option_d?: string;
+          question?: string;
+          quiz_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_quiz_id_fkey";
+            columns: ["quiz_id"];
+            isOneToOne: false;
+            referencedRelation: "quizzes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quizzes: {
+        Row: {
+          chapter_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          id: string;
+          is_published: boolean;
+          title: string;
+          updated_at: string;
+          verse_end: number | null;
+          verse_start: number | null;
+        };
+        Insert: {
+          chapter_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_published?: boolean;
+          title: string;
+          updated_at?: string;
+          verse_end?: number | null;
+          verse_start?: number | null;
+        };
+        Update: {
+          chapter_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_published?: boolean;
+          title?: string;
+          updated_at?: string;
+          verse_end?: number | null;
+          verse_start?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_chapter_id_fkey";
+            columns: ["chapter_id"];
+            isOneToOne: false;
+            referencedRelation: "chapters";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quizzes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      reading_sessions: {
+        Row: {
+          created_at: string;
+          duration_seconds: number;
+          ended_at: string;
+          id: string;
+          started_at: string;
+          user_id: string;
+          verse_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          duration_seconds: number;
+          ended_at: string;
+          id?: string;
+          started_at: string;
+          user_id: string;
+          verse_id: string;
+        };
+        Update: {
+          created_at?: string;
+          duration_seconds?: number;
+          ended_at?: string;
+          id?: string;
+          started_at?: string;
+          user_id?: string;
+          verse_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reading_sessions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reading_sessions_verse_id_fkey";
+            columns: ["verse_id"];
+            isOneToOne: false;
+            referencedRelation: "verses";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      schema_migrations: {
+        Row: {
+          applied_at: string;
+          filename: string;
+        };
+        Insert: {
+          applied_at?: string;
+          filename: string;
+        };
+        Update: {
+          applied_at?: string;
+          filename?: string;
+        };
+        Relationships: [];
+      };
+      verse_progress: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_memorized: boolean;
+          is_read: boolean;
+          memorized_at: string | null;
+          read_at: string | null;
+          total_time_seconds: number;
+          updated_at: string;
+          user_id: string;
+          verse_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_memorized?: boolean;
+          is_read?: boolean;
+          memorized_at?: string | null;
+          read_at?: string | null;
+          total_time_seconds?: number;
+          updated_at?: string;
+          user_id: string;
+          verse_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_memorized?: boolean;
+          is_read?: boolean;
+          memorized_at?: string | null;
+          read_at?: string | null;
+          total_time_seconds?: number;
+          updated_at?: string;
+          user_id?: string;
+          verse_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "verse_progress_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "verse_progress_verse_id_fkey";
+            columns: ["verse_id"];
+            isOneToOne: false;
+            referencedRelation: "verses";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      verses: {
+        Row: {
+          audio_provider: string | null;
+          audio_url: string | null;
+          chapter_id: string;
+          created_at: string;
+          display_order: number;
+          easy_explanation: string | null;
+          example: string | null;
+          id: string;
+          purport: string | null;
+          sanskrit_text: string;
+          translation: string | null;
+          updated_at: string;
+          verse_number: number;
+          verse_number_end: number | null;
+          word_to_word: string | null;
+        };
+        Insert: {
+          audio_provider?: string | null;
+          audio_url?: string | null;
+          chapter_id: string;
+          created_at?: string;
+          display_order: number;
+          easy_explanation?: string | null;
+          example?: string | null;
+          id?: string;
+          purport?: string | null;
+          sanskrit_text: string;
+          translation?: string | null;
+          updated_at?: string;
+          verse_number: number;
+          verse_number_end?: number | null;
+          word_to_word?: string | null;
+        };
+        Update: {
+          audio_provider?: string | null;
+          audio_url?: string | null;
+          chapter_id?: string;
+          created_at?: string;
+          display_order?: number;
+          easy_explanation?: string | null;
+          example?: string | null;
+          id?: string;
+          purport?: string | null;
+          sanskrit_text?: string;
+          translation?: string | null;
+          updated_at?: string;
+          verse_number?: number;
+          verse_number_end?: number | null;
+          word_to_word?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "verses_chapter_id_fkey";
+            columns: ["chapter_id"];
+            isOneToOne: false;
+            referencedRelation: "chapters";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
-    Views: Record<never, never>;
+    Views: {
+      [_ in never]: never;
+    };
     Functions: {
-      is_admin: {
-        Args: Record<never, never>;
-        Returns: boolean;
-      };
+      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       record_reading_session: {
-        Args: { p_verse_id: Uuid; p_duration: number };
+        Args: { p_duration: number; p_verse_id: string };
         Returns: undefined;
       };
       set_verse_progress: {
-        Args: {
-          p_verse_id: Uuid;
-          p_is_read?: boolean | null;
-          p_is_memorized?: boolean | null;
+        Args: { p_is_memorized?: boolean; p_is_read?: boolean; p_verse_id: string };
+        Returns: {
+          created_at: string;
+          id: string;
+          is_memorized: boolean;
+          is_read: boolean;
+          memorized_at: string | null;
+          read_at: string | null;
+          total_time_seconds: number;
+          updated_at: string;
+          user_id: string;
+          verse_id: string;
         };
-        Returns: Database["public"]["Tables"]["verse_progress"]["Row"];
+        SetofOptions: {
+          from: "*";
+          to: "verse_progress";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
-      submit_quiz_attempt: {
-        Args: { p_attempt_id: Uuid; p_answers: unknown };
-        Returns: unknown;
-      };
+      submit_quiz_attempt: { Args: { p_answers: Json; p_attempt_id: string }; Returns: Json };
     };
-    Enums: Record<never, never>;
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
-}
+};
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const;
