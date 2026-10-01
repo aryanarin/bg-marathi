@@ -61,7 +61,8 @@ _3/
 _4/
 
 # Loose analysis scripts from the earlier audio-extraction attempt.
-*.py
+# Root-level only: project scripts under web/scripts/ are tracked.
+/*.py
 download_fonts.js
 test_node.js
 vedabase_audio_analysis.txt
