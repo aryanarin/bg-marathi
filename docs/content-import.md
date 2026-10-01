@@ -135,6 +135,58 @@ FAIL  chapter-02.json  2 error(s)
 - Missing `easy_explanation`
 - `audio_url` present with no `audio_provider`
 
+## Extracting from the Marathi PDF (Chanakya legacy font)
+
+The source PDF (*Bhagavad-gītā As It Is*, Marathi) is typeset in the legacy
+**Chanakya** font — glyphs mapped onto 8-bit code points, not Unicode. Standard
+extraction yields gibberish. `scripts/extract_chapter.py` solves this:
+
+```bash
+cd web
+python -m pip install krutiextract pymupdf    # one time
+python scripts/extract_chapter.py 1            # writes content/chapter-01.draft.json
+```
+
+How it works:
+
+1. **Decode** with `krutiextract`, which reads the PDF's *logical* character
+   stream (so matras and the pre-base ि do not scramble) and auto-detects the
+   Chanakya profile.
+2. **Correct** the systematic glyph gaps the decoder leaves (chiefly the म्
+   half-form, a few conjuncts, and the curly-quote glyphs). Evidence-based, from
+   scanning the chapter's residual markers.
+3. **Parse** each verse into Sanskrit / word-to-word / translation / purport
+   using the book's markers (`॥ N॥` danda numbers, `term—` glosses, `तात्पर्य :`).
+4. **Group** combined verses (As It Is prints each Sanskrit text separately but
+   shares one commentary across a run, e.g. 1.16–18) and re-points the audio URL
+   to the combined recitation file.
+5. **Emit** `content/chapter-NN.draft.json`.
+
+### This output is a DRAFT, not final content
+
+It is machine-extracted **scripture**, so it must be proofread before use:
+
+- Accuracy of the decoded Marathi is high (~90%+) but not guaranteed.
+- `[?]` marks a glyph the decoder genuinely dropped — go to each one and supply
+  the correct character from the PDF.
+- `[पुनरावलोकन आवश्यक]` ("review required") marks a field the parser could not
+  populate — usually a verse-boundary or gloss/translation split that needs a
+  human eye.
+- The file is named `.draft.json` deliberately: the validator and importer only
+  read `chapter-NN.json`, so a draft is never imported by accident.
+
+**Review workflow:**
+
+1. Open `content/chapter-01.draft.json` beside the PDF.
+2. Fix every `[?]` and `[पुनरावलोकन आवश्यक]`, and check verse boundaries.
+3. Rename to `content/chapter-01.json`.
+4. `npm run content:validate -- 01` — must pass.
+5. Import (below).
+
+Repeat `python scripts/extract_chapter.py N` for other chapters once chapter 1
+confirms the approach. (The chapter name/description are currently hard-coded
+for chapter 1; generalise them when extending.)
+
 ## Importing — [Phase 4]
 
 The import script is not written yet. Its behaviour will be:
