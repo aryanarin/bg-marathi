@@ -20,6 +20,7 @@
     "audio:mirror": "tsx scripts/mirror-audio.ts",
     "seed:demo": "tsx scripts/seed-demo.ts",
     "content:validate": "tsx scripts/validate-content.ts",
+    "content:import": "tsx scripts/import-content.ts",
     "verify": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {
