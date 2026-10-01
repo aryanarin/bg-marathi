@@ -16,7 +16,7 @@ export function AudioPlayer({ src }: { src: string | null }) {
 
   if (!src) {
     return (
-      <p className="flex items-center gap-2 rounded border border-rule bg-sand/50 px-3 py-2 text-sm text-ink-subtle">
+      <p className="flex items-center gap-2 rounded border border-rule bg-surface-2/50 px-3 py-2 text-sm text-ink-subtle">
         <AlertCircle className="size-4" aria-hidden="true" />
         या श्लोकाचे उच्चारण अद्याप उपलब्ध नाही.
       </p>
@@ -25,7 +25,7 @@ export function AudioPlayer({ src }: { src: string | null }) {
 
   if (failed) {
     return (
-      <p className="flex items-center gap-2 rounded border border-rule bg-sand/50 px-3 py-2 text-sm text-ink-subtle">
+      <p className="flex items-center gap-2 rounded border border-rule bg-surface-2/50 px-3 py-2 text-sm text-ink-subtle">
         <AlertCircle className="size-4" aria-hidden="true" />
         उच्चारण सध्या ऐकता येत नाही.
       </p>

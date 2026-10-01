@@ -52,9 +52,9 @@ export const Input = React.forwardRef<
       ref={ref}
       aria-invalid={invalid || undefined}
       className={cn(
-        "h-11 w-full rounded border bg-parchment px-3 text-base text-ink",
+        "h-11 w-full rounded border bg-canvas px-3 text-base text-ink",
         "placeholder:text-ink-subtle",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-saffron",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
         invalid ? "border-danger" : "border-rule",
         className,
       )}

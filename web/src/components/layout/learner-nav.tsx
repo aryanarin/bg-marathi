@@ -23,8 +23,8 @@ export function LearnerNav() {
             className={cn(
               "rounded px-3 py-2 text-sm font-devanagari transition-colors",
               isActive
-                ? "bg-gold-soft/40 font-medium text-ink"
-                : "text-ink-muted hover:bg-sand hover:text-ink",
+                ? "bg-accent-soft/40 font-medium text-ink"
+                : "text-ink-muted hover:bg-surface-2 hover:text-ink",
             )}
           >
             {labelMarathi}

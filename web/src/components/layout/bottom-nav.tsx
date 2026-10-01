@@ -31,7 +31,7 @@ export function BottomNav() {
     <nav
       aria-label="मुख्य नेव्हिगेशन"
       className={cn(
-        "sticky bottom-0 z-40 border-t border-rule-gold bg-parchment/95 backdrop-blur-sm",
+        "sticky bottom-0 z-40 border-t border-rule bg-canvas/95 backdrop-blur-sm",
         "pb-[env(safe-area-inset-bottom)] md:hidden",
       )}
     >
@@ -50,7 +50,7 @@ export function BottomNav() {
                   "flex h-14 flex-col items-center justify-center gap-0.5 rounded",
                   "text-xs transition-colors",
                   isActive
-                    ? "text-saffron font-medium"
+                    ? "text-accent font-medium"
                     : "text-ink-subtle hover:text-ink",
                 )}
               >

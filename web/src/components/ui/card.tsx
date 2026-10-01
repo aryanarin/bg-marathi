@@ -3,17 +3,17 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Card: a warm parchment surface with a hairline gold rule.
+ * Card: a warm canvas surface with a hairline accent rule.
  *
  * Elevation comes from tonal layering rather than hard shadows, per the design
- * direction. Cards sit on the parchment canvas in cream.
+ * direction. Cards sit on the canvas canvas in surface.
  */
 export function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       className={cn(
-        "bg-cream border border-rule-gold rounded-lg",
-        "shadow-warm-sm",
+        "bg-surface border border-rule rounded-lg",
+        "shadow-card",
         className,
       )}
       {...props}

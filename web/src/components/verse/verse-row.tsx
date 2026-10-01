@@ -11,12 +11,12 @@ export function VerseRow({ verse }: { verse: VerseListItem }) {
     <Link
       href={`/verses/${verse.id}`}
       className={cn(
-        "flex items-start gap-3 rounded-lg border border-rule-gold bg-cream p-4",
-        "transition-colors hover:bg-gold-soft/20 focus-visible:ring-2 focus-visible:ring-saffron",
+        "flex items-start gap-3 rounded-lg border border-rule bg-surface p-4",
+        "transition-colors hover:bg-accent-soft/20 focus-visible:ring-2 focus-visible:ring-accent",
       )}
     >
       <span
-        className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-gold-soft/50 font-devanagari text-sm font-semibold text-ink"
+        className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-soft/50 font-devanagari text-sm font-semibold text-ink"
         aria-hidden="true"
       >
         {verseLabel(verse)}
@@ -38,7 +38,7 @@ export function VerseRow({ verse }: { verse: VerseListItem }) {
           <Check className="size-4 text-success" aria-label="वाचले" />
         )}
         {verse.is_memorized && (
-          <Sparkles className="size-4 text-gold-dark" aria-label="पाठ केले" />
+          <Sparkles className="size-4 text-accent" aria-label="पाठ केले" />
         )}
         {!verse.is_read && !verse.is_memorized && (
           <BookOpen className="size-4 text-ink-subtle/40" aria-hidden="true" />

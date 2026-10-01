@@ -25,12 +25,12 @@ export function EmptyState({
     <div
       className={cn(
         "flex flex-col items-center justify-center gap-3 rounded-lg",
-        "border border-dashed border-rule-gold bg-cream/50 px-6 py-12 text-center",
+        "border border-dashed border-rule bg-surface/50 px-6 py-12 text-center",
         className,
       )}
     >
       {Icon && (
-        <Icon className="size-8 text-gold" aria-hidden="true" strokeWidth={1.5} />
+        <Icon className="size-8 text-accent" aria-hidden="true" strokeWidth={1.5} />
       )}
       <h2 className="text-lg font-semibold text-ink">{title}</h2>
       {description && (

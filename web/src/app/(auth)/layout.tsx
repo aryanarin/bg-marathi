@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { siteConfig } from "@/lib/site-config";
 
 /**
@@ -12,18 +13,19 @@ export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex min-h-dvh flex-col bg-parchment">
-      <header className="border-b border-rule-gold">
-        <div className="mx-auto flex h-14 max-w-md items-center px-5">
+    <div className="flex min-h-dvh flex-col bg-canvas">
+      <header className="border-b border-rule">
+        <div className="mx-auto flex h-14 max-w-md items-center justify-between px-5">
           <Link
             href="/"
             className="flex items-center gap-2 rounded font-semibold text-ink"
           >
-            <span aria-hidden="true" className="text-xl leading-none text-gold-dark">
+            <span aria-hidden="true" className="text-xl leading-none text-accent">
               ॐ
             </span>
             <span className="font-devanagari">{siteConfig.name}</span>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

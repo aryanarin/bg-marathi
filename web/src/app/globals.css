@@ -1,73 +1,91 @@
 @import "tailwindcss";
 
+/* Dark mode is driven by a `.dark` class on <html>, set by the theme toggle
+ * before paint (see ThemeScript in layout). This variant lets `dark:` utilities
+ * work with class-based switching rather than the OS preference alone. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ---------------------------------------------------------------------------
  * Design tokens
  *
- * Palette and type scale are adapted from the "Sacred Illuminated Marathi Gita"
- * direction: warm parchment surfaces, temple gold accents, saffron for actions,
- * aged-ink text instead of pure black. No gradients, no decorative animation.
+ * Visual direction inspired by git-scm.com: minimal, flat, generous whitespace,
+ * hairline grey rules, a single warm orange accent, and a calm near-black dark
+ * theme. The Devanagari type system (generous leading for matras and conjuncts)
+ * is preserved from the earlier direction.
  *
- * Tailwind v4 is CSS-first: these tokens generate the utilities (bg-parchment,
- * text-ink, font-devanagari, ...). There is no tailwind.config.js.
+ * Tailwind v4 is CSS-first: these tokens generate the utilities (bg-surface,
+ * text-ink, border-rule, ...). Semantic names map to light values here and are
+ * overridden for `.dark` below, so components never hard-code a palette.
  * ------------------------------------------------------------------------- */
 
 @theme {
-  /* Surfaces, lightest to warmest */
-  --color-parchment: #fdfbf7;
-  --color-cream: #fff9f0;
-  --color-sand: #f7efe3;
-  --color-birch: #efe2d0;
+  /* Accent: git orange. Primary actions, links, active states, progress. */
+  --color-accent: #f05133;
+  --color-accent-hover: #d83e21;
+  --color-accent-soft: #fdeae5;
 
-  /* Text: aged ink rather than synthetic black */
-  --color-ink: #2d1f15;
-  --color-ink-muted: #5c4a3a;
-  --color-ink-subtle: #857562;
+  /* Light theme semantic surfaces and text (defaults). */
+  --color-canvas: #f4f4f4; /* page background */
+  --color-surface: #ffffff; /* cards, header */
+  --color-surface-2: #fafafa; /* subtle raised / hover */
+  --color-ink: #1b1b1b; /* primary text */
+  --color-ink-muted: #4d4d4d; /* secondary text */
+  --color-ink-subtle: #767676; /* tertiary text */
+  --color-rule: #e2e2e2; /* hairline borders */
+  --color-rule-strong: #cfcfcf;
 
-  /* Temple gold: illumination, accents, active states, progress fills */
-  --color-gold: #d4af37;
-  --color-gold-dark: #9c7c18;
-  --color-gold-soft: #f0dfa8;
+  /* Semantic states */
+  --color-success: #2e7d32;
+  --color-success-soft: #e6f4ea;
+  --color-danger: #c62828;
+  --color-danger-soft: #fdecea;
 
-  /* Sacred saffron: primary calls to action */
-  --color-saffron: #c2410c;
-  --color-saffron-dark: #9a3412;
-  --color-saffron-soft: #ffe8d9;
-
-  /* Luminous amber: highlights and badges */
-  --color-amber-glow: #f9a825;
-
-  /* Semantic states. Hues stay inside the warm family so feedback never looks
-   * like it belongs to a different product. */
-  --color-success: #15803d;
-  --color-success-soft: #dcfce7;
-  --color-danger: #b3261e;
-  --color-danger-soft: #fdeceb;
-
-  /* Hairline borders */
-  --color-rule: rgba(45, 31, 21, 0.1);
-  --color-rule-gold: rgba(212, 175, 55, 0.28);
-
-  /* Shapes: disciplined, near-architectural curvature */
-  --radius-sm: 0.125rem;
-  --radius-DEFAULT: 0.25rem;
+  /* Shapes: small, modern radii */
+  --radius-sm: 0.1875rem;
+  --radius-DEFAULT: 0.3125rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
 
-  /* Warm ambient elevation instead of hard grey drop shadows */
-  --shadow-warm:
-    0 8px 24px -4px rgba(45, 31, 21, 0.08),
-    0 2px 6px -1px rgba(212, 175, 55, 0.12);
-  --shadow-warm-sm: 0 1px 3px 0 rgba(45, 31, 21, 0.06);
+  /* Flat, minimal elevation */
+  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-pop: 0 4px 16px -2px rgba(0, 0, 0, 0.12);
 
-  /* Reading measure: ~60-65 characters, per the design direction */
+  /* Reading measure: ~60-65 characters */
   --container-reading: 38rem;
 }
 
-/* Font families are bound to the CSS variables that next/font generates in
- * src/app/layout.tsx. `inline` keeps them as var() references. */
+/* Dark theme overrides. Near-black surfaces, same orange accent. */
+.dark {
+  --color-accent: #f0603d;
+  --color-accent-hover: #f4785c;
+  --color-accent-soft: #3a241e;
+
+  --color-canvas: #16181d;
+  --color-surface: #1d2026;
+  --color-surface-2: #262a31;
+  --color-ink: #e8e8e8;
+  --color-ink-muted: #b4b4b4;
+  --color-ink-subtle: #8a8f98;
+  --color-rule: #30343c;
+  --color-rule-strong: #3f444d;
+
+  --color-success: #6cc26c;
+  --color-success-soft: #1e2a1e;
+  --color-danger: #f08a84;
+  --color-danger-soft: #2e1d1b;
+
+  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 4px 16px -2px rgba(0, 0, 0, 0.5);
+}
+
+/* Font families bound to the CSS variables next/font generates in layout.tsx.
+ * Latin UI uses a system sans stack to match git-scm's clean feel; Devanagari
+ * and verse keep their dedicated faces. */
 @theme inline {
-  --font-sans: var(--font-literata), Georgia, "Times New Roman", serif;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
   --font-devanagari:
     var(--font-noto-devanagari), "Noto Sans Devanagari", "Nirmala UI", sans-serif;
   --font-verse:
@@ -81,30 +99,32 @@
 
 @layer base {
   html {
-    /* Anchor links and programmatic scrolls land below the sticky header. */
     scroll-padding-top: 5rem;
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
-    background-color: var(--color-parchment);
+    background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    /* Slightly larger base size: this is a long-form reading app used mostly on
-     * phones by readers who are not necessarily young. */
-    font-size: 1.0625rem;
-    line-height: 1.7;
+    font-size: 1rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* Devanagari needs more vertical room than Latin so that matras above and
-   * conjuncts below are never clipped. Applied wherever the script appears. */
+  /* Devanagari needs more vertical room than Latin so matras and conjuncts are
+   * never clipped. Applied wherever the script appears. */
   :lang(mr),
   :lang(sa),
   :lang(hi) {
     font-family: var(--font-devanagari);
-    line-height: 1.95;
+    line-height: 1.9;
   }
 
   h1,
@@ -112,22 +132,26 @@
   h3,
   h4 {
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.25;
     text-wrap: balance;
+    letter-spacing: -0.01em;
   }
 
   p {
     text-wrap: pretty;
   }
 
-  /* A single, consistent, clearly visible focus ring. Never removed. */
+  a {
+    color: inherit;
+  }
+
+  /* One consistent, clearly visible focus ring. Never removed. */
   :focus-visible {
-    outline: 2px solid var(--color-saffron);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
     border-radius: 2px;
   }
 
-  /* Respect users who ask for less motion. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -145,8 +169,7 @@
  * ------------------------------------------------------------------------- */
 
 @layer components {
-  /* Sanskrit verse presentation. Generous leading is deliberate: Devanagari
-   * conjuncts (jodakshare) and diacritics (matras) need the space. */
+  /* Sanskrit verse presentation. Generous leading for conjuncts and matras. */
   .verse-text {
     font-family: var(--font-verse);
     font-size: 1.375rem;
@@ -164,7 +187,7 @@
   /* Marathi prose: translation, purport, explanation. */
   .prose-marathi {
     font-family: var(--font-devanagari);
-    line-height: 1.95;
+    line-height: 1.9;
   }
 
   .prose-marathi > * + * {
@@ -183,8 +206,8 @@
     left: 1rem;
     top: 1rem;
     padding: 0.5rem 1rem;
-    background-color: var(--color-cream);
-    border: 1px solid var(--color-gold);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-accent);
     border-radius: var(--radius-DEFAULT);
   }
 }

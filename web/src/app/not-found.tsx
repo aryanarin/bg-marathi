@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <Container width="reading" className="py-16">
       <div className="flex flex-col items-center gap-4 text-center">
-        <p aria-hidden="true" className="font-verse text-3xl text-gold-dark">
+        <p aria-hidden="true" className="font-verse text-3xl text-accent">
           ॐ
         </p>
         <h1 className="font-devanagari text-2xl text-ink">हे पान सापडले नाही</h1>

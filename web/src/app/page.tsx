@@ -51,11 +51,11 @@ export default function HomePage() {
       <main id="main-content" className="flex-1">
         {/* Hero. No background image dependency: the palette and typography
             carry the devotional tone on their own. */}
-        <section className="border-b border-rule-gold bg-cream/40">
+        <section className="border-b border-rule bg-surface/40">
           <Container width="default" className="py-14 text-center sm:py-20">
             <p
               aria-hidden="true"
-              className="mb-5 font-verse text-3xl leading-none text-gold-dark"
+              className="mb-5 font-verse text-3xl leading-none text-accent"
             >
               ॐ
             </p>
@@ -69,7 +69,7 @@ export default function HomePage() {
             </p>
 
             {/* A real verse, shown as a sample of the reading experience. */}
-            <blockquote className="mx-auto mt-10 max-w-reading rounded-lg border border-rule-gold bg-cream px-6 py-7 shadow-warm-sm">
+            <blockquote className="mx-auto mt-10 max-w-reading rounded-lg border border-rule bg-surface px-6 py-7 shadow-card">
               <p className="verse-text text-center text-ink" lang="sa">
                 {"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि ॥"}
               </p>
@@ -102,10 +102,10 @@ export default function HomePage() {
               {features.map(({ icon: Icon, title, description }) => (
                 <li
                   key={title}
-                  className="rounded-lg border border-rule-gold bg-cream p-5"
+                  className="rounded-lg border border-rule bg-surface p-5"
                 >
                   <Icon
-                    className="size-6 text-gold-dark"
+                    className="size-6 text-accent"
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />

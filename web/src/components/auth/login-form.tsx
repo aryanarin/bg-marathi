@@ -45,7 +45,7 @@ export function LoginForm({ next }: { next?: string }) {
       <div className="flex justify-end">
         <Link
           href="/forgot-password"
-          className="rounded text-sm text-saffron underline underline-offset-4"
+          className="rounded text-sm text-accent underline underline-offset-4"
         >
           पासवर्ड विसरलात?
         </Link>

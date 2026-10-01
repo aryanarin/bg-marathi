@@ -75,9 +75,9 @@ export function VerseActions({
         onClick={onToggleMemorized}
         disabled={pending}
         aria-pressed={memorized}
-        className={cn(memorized && "border-gold")}
+        className={cn(memorized && "border-accent")}
       >
-        <Sparkles className={cn("size-5", memorized ? "text-gold-dark" : "text-ink-subtle")} />
+        <Sparkles className={cn("size-5", memorized ? "text-accent" : "text-ink-subtle")} />
         {memorized ? "पाठ झाले" : "पाठ झाले म्हणून खुणा करा"}
       </Button>
     </div>

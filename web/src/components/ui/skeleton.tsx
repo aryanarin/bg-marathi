@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("animate-pulse rounded bg-birch/60", className)}
+      className={cn("animate-pulse rounded bg-surface-2/60", className)}
       aria-hidden="true"
       {...props}
     />
@@ -19,7 +19,7 @@ export function CardListSkeleton({ count = 5 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="rounded-lg border border-rule-gold bg-cream p-5 space-y-3"
+          className="rounded-lg border border-rule bg-surface p-5 space-y-3"
         >
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-5 w-full" />

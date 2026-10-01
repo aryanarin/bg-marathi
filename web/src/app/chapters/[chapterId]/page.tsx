@@ -45,7 +45,7 @@ export default async function ChapterDetailPage({
 
       <main id="main-content" className="flex-1">
         <Container width="default" className="py-8">
-          <header className="border-b border-rule-gold pb-6">
+          <header className="border-b border-rule pb-6">
             <p className="font-devanagari text-sm text-ink-subtle">
               अध्याय {toDevanagari(chapter.chapter_number)}
             </p>

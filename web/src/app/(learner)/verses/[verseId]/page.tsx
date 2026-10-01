@@ -42,8 +42,8 @@ function Section({
   lang?: string;
 }) {
   return (
-    <section className="border-t border-rule-gold pt-5">
-      <h2 className="mb-2 font-devanagari text-sm font-semibold uppercase tracking-wide text-gold-dark">
+    <section className="border-t border-rule pt-5">
+      <h2 className="mb-2 font-devanagari text-sm font-semibold uppercase tracking-wide text-accent">
         {heading}
       </h2>
       <div className="prose-marathi text-ink-muted" lang={lang}>
@@ -80,7 +80,7 @@ export default async function VersePage({ params }: PageProps<"/verses/[verseId]
       <header>
         <Link
           href={`/chapters/${chapter.chapter_number}`}
-          className="rounded text-sm text-saffron underline underline-offset-4"
+          className="rounded text-sm text-accent underline underline-offset-4"
         >
           ← अध्याय {toDevanagari(chapter.chapter_number)}: {chapter.name_marathi}
         </Link>
@@ -90,7 +90,7 @@ export default async function VersePage({ params }: PageProps<"/verses/[verseId]
       </header>
 
       {/* Sanskrit verse */}
-      <div className="mt-6 rounded-lg border border-rule-gold bg-cream px-5 py-6">
+      <div className="mt-6 rounded-lg border border-rule bg-surface px-5 py-6">
         <p className="verse-text text-center text-ink" lang="sa">
           {verse.sanskrit_text}
         </p>
@@ -112,9 +112,9 @@ export default async function VersePage({ params }: PageProps<"/verses/[verseId]
         </div>
       )}
       {!user && (
-        <p className="mt-6 rounded border border-rule-gold bg-gold-soft/20 px-4 py-3 text-sm text-ink-muted">
+        <p className="mt-6 rounded border border-rule bg-accent-soft/20 px-4 py-3 text-sm text-ink-muted">
           प्रगती नोंदवण्यासाठी{" "}
-          <Link href="/login" className="font-medium text-saffron underline underline-offset-4">
+          <Link href="/login" className="font-medium text-accent underline underline-offset-4">
             प्रवेश करा
           </Link>
           .
@@ -137,11 +137,11 @@ export default async function VersePage({ params }: PageProps<"/verses/[verseId]
       </div>
 
       {/* Prev / next */}
-      <nav className="mt-10 flex items-center justify-between border-t border-rule-gold pt-5">
+      <nav className="mt-10 flex items-center justify-between border-t border-rule pt-5">
         {neighbors.prevId ? (
           <Link
             href={`/verses/${neighbors.prevId}`}
-            className="inline-flex items-center gap-1 rounded text-sm text-saffron underline underline-offset-4"
+            className="inline-flex items-center gap-1 rounded text-sm text-accent underline underline-offset-4"
           >
             <ChevronLeft className="size-4" /> मागील श्लोक
           </Link>
@@ -151,7 +151,7 @@ export default async function VersePage({ params }: PageProps<"/verses/[verseId]
         {neighbors.nextId ? (
           <Link
             href={`/verses/${neighbors.nextId}`}
-            className="inline-flex items-center gap-1 rounded text-sm text-saffron underline underline-offset-4"
+            className="inline-flex items-center gap-1 rounded text-sm text-accent underline underline-offset-4"
           >
             पुढील श्लोक <ChevronRight className="size-4" />
           </Link>

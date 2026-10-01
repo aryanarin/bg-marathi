@@ -37,7 +37,7 @@ export default async function LoginPage({
 
         <p className="text-sm text-ink-muted">
           खाते नाही?{" "}
-          <Link href="/register" className="rounded font-medium text-saffron underline underline-offset-4">
+          <Link href="/register" className="rounded font-medium text-accent underline underline-offset-4">
             नोंदणी करा
           </Link>
         </p>

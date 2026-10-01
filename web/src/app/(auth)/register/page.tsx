@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
         <p className="text-sm text-ink-muted">
           खाते आहे?{" "}
-          <Link href="/login" className="rounded font-medium text-saffron underline underline-offset-4">
+          <Link href="/login" className="rounded font-medium text-accent underline underline-offset-4">
             प्रवेश करा
           </Link>
         </p>

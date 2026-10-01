@@ -50,7 +50,7 @@ export default async function ChaptersPage() {
                 <li key={c.id}>
                   <Link
                     href={`/chapters/${c.chapter_number}`}
-                    className="block rounded-lg border border-rule-gold bg-cream p-5 transition-colors hover:bg-gold-soft/20 focus-visible:ring-2 focus-visible:ring-saffron"
+                    className="block rounded-lg border border-rule bg-surface p-5 transition-colors hover:bg-accent-soft/20 focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <div className="flex items-baseline justify-between gap-3">
                       <h2 className="font-devanagari text-lg font-semibold text-ink">

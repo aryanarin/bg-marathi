@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 /**
  * Button.
  *
- * Variants follow the design direction: saffron for primary actions, an
- * ivory-and-gold "sacred" secondary, and quiet ghost/link styles.
+ * Variants follow the design direction: accent for primary actions, an
+ * ivory-and-accent "sacred" secondary, and quiet ghost/link styles.
  *
  * Sizes keep a minimum 44px touch target on the default and larger variants,
  * which is the iOS/Android accessibility guideline. `sm` is reserved for
@@ -25,14 +25,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-saffron text-parchment hover:bg-saffron-dark",
+        primary: "bg-accent text-canvas hover:bg-accent-hover",
         sacred:
-          "bg-cream text-ink border border-gold hover:bg-gold-soft/40",
+          "bg-surface text-ink border border-accent hover:bg-accent-soft/40",
         outline:
-          "bg-transparent text-ink border border-rule hover:bg-sand",
-        ghost: "bg-transparent text-ink hover:bg-sand",
-        danger: "bg-danger text-parchment hover:brightness-90",
-        link: "bg-transparent text-saffron underline underline-offset-4 hover:text-saffron-dark",
+          "bg-transparent text-ink border border-rule hover:bg-surface-2",
+        ghost: "bg-transparent text-ink hover:bg-surface-2",
+        danger: "bg-danger text-canvas hover:brightness-90",
+        link: "bg-transparent text-accent underline underline-offset-4 hover:text-accent-hover",
       },
       size: {
         sm: "h-9 px-3 text-sm [&_svg]:size-4",

@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site-config";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-rule-gold bg-cream/60">
+    <footer className="mt-auto border-t border-rule bg-surface/60">
       <Container width="wide" className="py-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
@@ -16,10 +16,10 @@ export function SiteFooter() {
           </div>
 
           <nav aria-label="तळटीप दुवे" className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <Link href="/about" className="rounded text-ink-muted hover:text-saffron">
+            <Link href="/about" className="rounded text-ink-muted hover:text-accent">
               आमच्याविषयी
             </Link>
-            <Link href="/chapters" className="rounded text-ink-muted hover:text-saffron">
+            <Link href="/chapters" className="rounded text-ink-muted hover:text-accent">
               अध्याय
             </Link>
           </nav>

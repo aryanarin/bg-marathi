@@ -44,7 +44,7 @@ export default function DashboardPage() {
               <Card>
                 <CardContent className="p-4 pt-4">
                   <Icon
-                    className="size-5 text-gold-dark"
+                    className="size-5 text-accent"
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
