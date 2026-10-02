@@ -30,6 +30,14 @@ import re
 import sys
 from pathlib import Path
 
+# Windows consoles default to cp1252, which cannot encode Devanagari in status
+# lines. Force UTF-8 so progress output (chapter names) never crashes the run.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 try:
     from krutiextract import convert_pdf
 except ImportError:
@@ -39,12 +47,30 @@ PDF = Path(r"C:\Users\ysary\Downloads\Documents\bhagvad-gita-marathi-_compress.p
 REPO = Path(__file__).resolve().parent.parent.parent  # scripts/ -> web/ -> repo
 CONTENT_DIR = REPO / "content"
 
-# Chapter body start/end anchors. The body of each chapter opens with the first
-# speaker's "उवाच" or the first bold Sanskrit; we anchor chapter 1 on the known
-# opening and bound it by the next chapter heading in body form.
-CHAPTER_HEADINGS = {
-    1: ("धृतराष्ट्र उवाच", "अध्याय दुसरा"),
-}
+# Marathi ordinal words in the book's chapter headings, index 1..18. Some
+# chapters use spelling variants (ch4 "चवथा", not "चौथा"), so each entry is a
+# list of accepted spellings. Boundaries are the BODY heading "अध्याय <word>**"
+# (the "**" distinguishes the real heading from the "अध्याय 4" running header).
+CHAPTER_ORDINALS = [
+    ["पहिला"],
+    ["दुसरा"],
+    ["तिसरा"],
+    ["चवथा", "चौथा"],
+    ["पाचवा"],
+    ["सहावा"],
+    ["सातवा"],
+    ["आठवा"],
+    ["नववा"],
+    ["दहावा"],
+    ["अकरावा"],
+    ["बारावा"],
+    ["तेरावा"],
+    ["चौदावा"],
+    ["पंधरावा"],
+    ["सोळावा"],
+    ["सतरावा"],
+    ["अठरावा"],
+]
 
 # ---------------------------------------------------------------------------
 # Correction table.
@@ -142,17 +168,59 @@ def dev_to_int(s: str) -> int:
     return int("".join(str(DEV_DIGITS[c]) for c in s))
 
 
-def extract_chapter(chapter: int) -> dict:
-    md, profile, _warnings = convert_pdf(str(PDF))
-    md = correct(md)
+def chapter_body_offset(md: str, chapter: int) -> int:
+    """
+    Offset of a chapter's heading in the BODY (not the table of contents).
 
-    open_anchor, close_anchor = CHAPTER_HEADINGS[chapter]
-    start = md.find(open_anchor)
-    if start < 0:
-        sys.exit(f"Could not find chapter {chapter} body anchor {open_anchor!r}")
-    # Bound by the next-chapter heading occurring AFTER the body start.
-    ends = [m.start() for m in re.finditer(close_anchor, md) if m.start() > start]
-    end = ends[0] if ends else len(md)
+    Each "अध्याय <ordinal>" appears twice: once in the TOC (small offset, with
+    dotted leaders) and once at the real chapter start. We take the last
+    occurrence, which is the body one. Chapters whose heading renders only once
+    fall back to the single hit.
+    """
+    words = CHAPTER_ORDINALS[chapter - 1]
+    # Match the real heading "अध्याय <word>**" (the trailing ** separates it from
+    # the "अध्याय 4" running-header on every page). Try each spelling variant.
+    # Note \s* not \s+: some headings render with no space ("अध्यायपंधरावा").
+    for word in words:
+        hits = [m.start() for m in re.finditer(r"अध्याय\s*" + word + r"\s*\*\*", md)]
+        body_hits = [h for h in hits if h > 20000]
+        if body_hits:
+            return body_hits[0]
+    # Fallback: plain "अध्याय <word>" without the ** (some headings differ).
+    for word in words:
+        hits = [h for h in (m.start() for m in re.finditer(r"अध्याय\s*" + word, md)) if h > 20000]
+        if hits:
+            return hits[0]
+    sys.exit(f"Could not find body heading for chapter {chapter} ({words})")
+
+
+def extract_chapter_name(body: str) -> tuple[str, str]:
+    """
+    Pull the chapter's yoga name from the heading block, e.g.
+    "**सांख्ययोग (गीतेचे सार)**" -> name_sanskrit "सांख्ययोग",
+    name_marathi the parenthetical gloss (falls back to the full title).
+    """
+    # The yoga name is a Devanagari word (often with spaces, e.g. "पुरुषोत्तम
+    # योग" or "राजविद्या राजगुह्ययोग") ending in "योग", inside the heading block.
+    # Search the first ~400 chars after the heading. Require it to contain योग so
+    # a stray fragment like "्र" is not picked up.
+    head = body[:400]
+    m = re.search(r"\*\*\s*([ऀ-ॿ][ऀ-ॿ \u200d]*?योग)\s*\**\s*(?:\(([^)]*)\))?", head)
+    if not m:
+        return ("", "")
+    sanskrit = re.sub(r"\s+", "", m.group(1)).strip()
+    marathi = (m.group(2) or sanskrit).strip()
+    return sanskrit, marathi
+
+
+def extract_chapter_from_md(md: str, chapter: int) -> dict:
+    """Extract one chapter from already-decoded + corrected markdown."""
+    start = chapter_body_offset(md, chapter)
+    # Bound by the next chapter's body heading, or end of document for ch 18.
+    if chapter < 18:
+        end = chapter_body_offset(md, chapter + 1)
+    else:
+        end = len(md)
     body = md[start:end]
 
     # Walk danda markers; each marks the end of a Sanskrit block.
@@ -226,11 +294,19 @@ def extract_chapter(chapter: int) -> dict:
 
     verses = group_combined_verses(verses, chapter)
 
+    name_sanskrit, name_marathi = extract_chapter_name(body)
+    # Fallbacks so required fields are never empty if the heading parse misses;
+    # the admin can correct names in the UI like any other field.
+    if not name_sanskrit:
+        name_sanskrit = f"अध्याय {chapter}"
+    if not name_marathi:
+        name_marathi = name_sanskrit
+
     return {
         "chapter_number": chapter,
-        "name_sanskrit": "अर्जुनविषादयोग",
-        "name_marathi": "अर्जुनाचा विषाद",
-        "description": "कुरुक्षेत्राच्या रणांगणावर अर्जुनाला झालेला मोह आणि विषाद.",
+        "name_sanskrit": name_sanskrit,
+        "name_marathi": name_marathi,
+        "description": "",
         "verses": verses,
     }
 
@@ -345,9 +421,9 @@ def group_combined_verses(verses: list[dict], chapter: int) -> list[dict]:
 REVIEW = "[पुनरावलोकन आवश्यक]"  # "review required"
 
 
-def main() -> None:
-    chapter = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-    data = extract_chapter(chapter)
+def write_chapter(md: str, chapter: int) -> None:
+    """Extract one chapter from already-decoded markdown and write its draft."""
+    data = extract_chapter_from_md(md, chapter)
 
     verses = data["verses"]
     empty_fields = 0
@@ -358,28 +434,51 @@ def main() -> None:
                 empty_fields += 1
 
     CONTENT_DIR.mkdir(exist_ok=True)
-    # Written as a DRAFT: this is machine-extracted scripture that MUST be
-    # proofread before it becomes the live chapter-01.json. The validator and
-    # importer only look at chapter-NN.json, so a .draft.json is never imported
-    # by accident.
     out = CONTENT_DIR / f"chapter-{chapter:02d}.draft.json"
     out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     residual = sum(
-        v["sanskrit_text"].count("[?]")
-        + v["word_to_word"].count("[?]")
-        + v["translation"].count("[?]")
-        + v["purport"].count("[?]")
+        f.count("[?]")
         for v in verses
+        for f in (v["sanskrit_text"], v["word_to_word"], v["translation"], v["purport"])
     )
     nums = [v["verse_number"] for v in verses]
-    print(f"Wrote {out}")
-    print(f"  verses: {len(verses)}  (numbers {nums[0]}..{nums[-1]})")
-    print(f"  residual [?] glyph markers to review: {residual}")
-    print(f"  fields the parser left blank (need review): {empty_fields}")
+    span = f"{nums[0]}..{nums[-1]}" if nums else "none"
     print(
-        "\nThis is a DRAFT. Proofread against the PDF, rename to "
-        f"chapter-{chapter:02d}.json, then run `npm run content:validate`."
+        f"ch{chapter:02d}: {len(verses):3d} verses ({span})  "
+        f"name={data['name_sanskrit']!r}  [?]={residual}  blank_fields={empty_fields}"
+    )
+
+
+def main() -> None:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    arg = args[0] if args else "1"
+
+    # Optional decode cache: decoding the PDF is slow (minutes), so a cached copy
+    # of the raw decoded markdown speeds up iteration. Pass --cache <path>.
+    cache_path = None
+    if "--cache" in sys.argv:
+        cache_path = Path(sys.argv[sys.argv.index("--cache") + 1])
+
+    if cache_path and cache_path.exists():
+        print(f"Using cached decode: {cache_path}")
+        md = cache_path.read_text(encoding="utf-8")
+    else:
+        print("Decoding PDF (Chanakya -> Unicode)…")
+        md, _profile, _warnings = convert_pdf(str(PDF))
+        if cache_path:
+            cache_path.write_text(md, encoding="utf-8")
+    md = correct(md)
+
+    chapters = range(1, 19) if arg.lower() == "all" else [int(arg)]
+    for chapter in chapters:
+        write_chapter(md, chapter)
+
+    print(
+        "\nDRAFTS written to content/chapter-NN.draft.json. These are "
+        "machine-extracted scripture: proofread, rename to chapter-NN.json, "
+        "then `npm run content:validate` before import. (Import of a .draft "
+        "file is also supported for an audit-in-browser launch.)"
     )
 
 

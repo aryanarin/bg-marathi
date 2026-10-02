@@ -80,47 +80,27 @@ function nn(v: string | null | undefined): string | null {
   return t.length > 0 ? t : null;
 }
 
-async function main() {
-  const args = process.argv.slice(2);
-  const dryRun = args.includes("--dry-run");
-  const target = args.find((a) => a !== "--dry-run");
-  if (!target) {
-    console.error(`${RED}Usage:${RESET} npm run content:import -- 01 [--dry-run]`);
-    process.exit(1);
-  }
+type Db = ReturnType<typeof createClient<Database>>;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    console.error(`${RED}Missing Supabase env in .env.local${RESET}`);
-    process.exit(1);
-  }
-
-  const file = resolveFile(target);
+async function importOne(supabase: Db, file: string, dryRun: boolean): Promise<void> {
   let chapter: ChapterJson;
   try {
     chapter = JSON.parse(readFileSync(file, "utf8"));
   } catch (e) {
     console.error(`${RED}Could not read/parse ${file}:${RESET} ${(e as Error).message}`);
-    process.exit(1);
-  }
-
-  const isDraft = file.endsWith(".draft.json");
-  const markerCount = JSON.stringify(chapter).match(/\[\?\]|पुनरावलोकन आवश्यक/g)?.length ?? 0;
-
-  console.log(`${DIM}Importing ${path.basename(file)} — chapter ${chapter.chapter_number}, ${chapter.verses.length} verses${RESET}`);
-  if (isDraft) {
-    console.log(`${YELLOW}DRAFT import: ${markerCount} review marker(s) will be stored for in-app editing.${RESET}`);
-  }
-
-  if (dryRun) {
-    console.log(`${YELLOW}Dry run — nothing written.${RESET}`);
     return;
   }
 
-  const supabase = createClient<Database>(url, key, { auth: { persistSession: false } });
+  const isDraft = file.endsWith(".draft.json");
+  const markers = JSON.stringify(chapter).match(/\[\?\]|पुनरावलोकन आवश्यक/g)?.length ?? 0;
 
-  // Upsert the chapter.
+  if (dryRun) {
+    console.log(
+      `${DIM}would import ${path.basename(file)} — ch ${chapter.chapter_number}, ${chapter.verses.length} verses, ${markers} markers${RESET}`,
+    );
+    return;
+  }
+
   const { data: chapterRow, error: chErr } = await supabase
     .from("chapters")
     .upsert(
@@ -131,6 +111,8 @@ async function main() {
         description: nn(chapter.description),
         total_verses: Math.max(chapter.verses.length, lastVerseNumber(chapter)),
         display_order: chapter.chapter_number,
+        // Imported chapters stay UNPUBLISHED (schema default). The admin audits
+        // and publishes each chapter from the admin UI when it is ready.
       },
       { onConflict: "chapter_number" },
     )
@@ -138,8 +120,8 @@ async function main() {
     .single();
 
   if (chErr || !chapterRow) {
-    console.error(`${RED}Chapter upsert failed:${RESET} ${chErr?.message}`);
-    process.exit(1);
+    console.error(`${RED}ch ${chapter.chapter_number} chapter upsert failed:${RESET} ${chErr?.message}`);
+    return;
   }
 
   let ok = 0;
@@ -165,15 +147,51 @@ async function main() {
       { onConflict: "chapter_id,verse_number" },
     );
     if (error) {
-      console.error(`${RED}  verse ${v.verse_number} failed:${RESET} ${error.message}`);
+      console.error(`${RED}  ch${chapter.chapter_number} verse ${v.verse_number} failed:${RESET} ${error.message}`);
     } else {
       ok++;
     }
   }
 
-  console.log(`\n${GREEN}Done.${RESET} Chapter ${chapter.chapter_number}: ${ok}/${chapter.verses.length} verses imported.`);
-  if (isDraft) {
-    console.log(`The admin can now edit and correct these verses in the admin UI.`);
+  const tag = isDraft ? `${YELLOW}draft${RESET}` : `${GREEN}final${RESET}`;
+  console.log(
+    `${GREEN}ch ${String(chapter.chapter_number).padStart(2, "0")}${RESET}: ${ok}/${chapter.verses.length} verses (${tag}, ${markers} markers)`,
+  );
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  const dryRun = args.includes("--dry-run");
+  const target = args.find((a) => a !== "--dry-run");
+  if (!target) {
+    console.error(`${RED}Usage:${RESET} npm run content:import -- 01 | all [--dry-run]`);
+    process.exit(1);
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    console.error(`${RED}Missing Supabase env in .env.local${RESET}`);
+    process.exit(1);
+  }
+
+  const supabase = createClient<Database>(url, key, { auth: { persistSession: false } });
+
+  const files =
+    target.toLowerCase() === "all"
+      ? Array.from({ length: 18 }, (_, i) => resolveFile(String(i + 1)))
+      : [resolveFile(target)];
+
+  console.log(`${DIM}Importing ${files.length} chapter file(s). Chapters are imported UNPUBLISHED.${RESET}\n`);
+
+  for (const file of files) {
+    await importOne(supabase, file, dryRun);
+  }
+
+  if (!dryRun) {
+    console.log(
+      `\n${GREEN}Done.${RESET} All chapters are unpublished — the admin publishes each from /admin after auditing.`,
+    );
   }
 }
 
