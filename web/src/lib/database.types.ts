@@ -1,13 +1,9 @@
 /**
  * Database types — GENERATED from the live schema.
  *
- * Regenerate after any migration:
- *   node scripts/gen-types.mjs
- * which runs `supabase gen types typescript --db-url $SUPABASE_DB_URL --schema public`.
- *
- * Do not hand-edit. Semantic enum unions (UserRole, QuizOption, ...) live in
- * lib/types.ts, layered on top of these. Enum-like text columns surface here as
- * plain string, which the app narrows via those unions.
+ * Regenerate after any migration (see scripts/ in prior runs):
+ *   supabase gen types typescript --db-url $SUPABASE_DB_URL --schema public
+ * Do not hand-edit. Semantic enum unions live in lib/types.ts.
  */
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
@@ -22,6 +18,7 @@ export type Database = {
           description: string | null;
           display_order: number;
           id: string;
+          is_published: boolean;
           name_marathi: string;
           name_sanskrit: string;
           total_verses: number;
@@ -33,6 +30,7 @@ export type Database = {
           description?: string | null;
           display_order: number;
           id?: string;
+          is_published?: boolean;
           name_marathi: string;
           name_sanskrit: string;
           total_verses: number;
@@ -44,6 +42,7 @@ export type Database = {
           description?: string | null;
           display_order?: number;
           id?: string;
+          is_published?: boolean;
           name_marathi?: string;
           name_sanskrit?: string;
           total_verses?: number;

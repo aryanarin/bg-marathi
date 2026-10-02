@@ -80,6 +80,24 @@ export async function deleteChapter(chapterId: string): Promise<void> {
   revalidatePath("/chapters");
 }
 
+/**
+ * Publish or unpublish a whole chapter.
+ *
+ * Unpublished chapters (and all their verses) are invisible to learners,
+ * enforced in the database by the chapter/verse RLS policies. The admin audits
+ * a chapter's content, then publishes it so devotees can read it.
+ */
+export async function setChapterPublished(
+  chapterId: string,
+  publish: boolean,
+): Promise<void> {
+  await requireAdmin();
+  const supabase = await createClient();
+  await supabase.from("chapters").update({ is_published: publish }).eq("id", chapterId);
+  revalidatePath("/admin/chapters");
+  revalidatePath("/chapters");
+}
+
 /* --- Verses --------------------------------------------------------------- */
 
 const verseSchema = z.object({

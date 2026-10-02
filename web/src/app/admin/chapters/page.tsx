@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, Pencil, Plus, ScrollText } from "lucide-react";
 
-import { DeleteChapterButton } from "@/components/admin/content-row-actions";
+import {
+  ChapterPublishToggle,
+  DeleteChapterButton,
+} from "@/components/admin/content-row-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -54,6 +57,7 @@ export default async function AdminChaptersPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
+                    <ChapterPublishToggle chapterId={c.id} published={c.is_published} />
                     <Button asChild variant="ghost" size="sm">
                       <Link href={`/admin/verses?chapter=${c.id}`}>
                         <ScrollText className="size-4" /> श्लोक
