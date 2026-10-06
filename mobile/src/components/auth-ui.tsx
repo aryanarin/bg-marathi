@@ -1,5 +1,5 @@
-import { Image } from "react-native";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
