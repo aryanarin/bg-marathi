@@ -7,12 +7,6 @@
     "icon": "./assets/icon.png",
     "scheme": "gitamarathi",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#fdfbf7"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "eu.org.bhakti.gita.app"
@@ -45,7 +39,9 @@
         {
           "enableBackgroundPlayback": true
         }
-      ]
+      ],
+      "expo-font",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
