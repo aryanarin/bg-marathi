@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
@@ -19,9 +20,14 @@ export function SiteHeader({ children }: { children?: React.ReactNode }) {
           href="/"
           className="flex items-center gap-2 rounded text-lg font-semibold text-ink"
         >
-          <span aria-hidden="true" className="text-accent text-xl leading-none">
-            ॐ
-          </span>
+          <Image
+            src="/images/logo-mark.png"
+            alt=""
+            width={32}
+            height={32}
+            className="size-8 rounded-full"
+            priority
+          />
           <span className="font-devanagari">{siteConfig.name}</span>
         </Link>
 
