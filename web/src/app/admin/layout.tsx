@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { AdminNav } from "@/components/admin/admin-nav";
@@ -25,9 +26,13 @@ export default async function AdminLayout({
       <header className="sticky top-0 z-40 border-b border-rule bg-canvas/90 backdrop-blur-sm">
         <Container width="wide" className="flex h-14 items-center justify-between gap-4">
           <Link href="/admin" className="flex items-center gap-2 rounded font-semibold text-ink">
-            <span aria-hidden="true" className="text-xl leading-none text-accent">
-              ॐ
-            </span>
+            <Image
+              src="/images/logo-mark.png"
+              alt=""
+              width={28}
+              height={28}
+              className="size-7 rounded-full"
+            />
             <span className="font-devanagari">{siteConfig.name}</span>
             <span className="rounded bg-accent-soft px-1.5 py-0.5 text-xs font-medium text-accent">
               प्रशासन

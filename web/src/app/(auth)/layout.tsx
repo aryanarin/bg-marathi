@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -20,9 +21,13 @@ export default function AuthLayout({
             href="/"
             className="flex items-center gap-2 rounded font-semibold text-ink"
           >
-            <span aria-hidden="true" className="text-xl leading-none text-accent">
-              ॐ
-            </span>
+            <Image
+              src="/images/logo-mark.png"
+              alt=""
+              width={28}
+              height={28}
+              className="size-7 rounded-full"
+            />
             <span className="font-devanagari">{siteConfig.name}</span>
           </Link>
           <ThemeToggle />

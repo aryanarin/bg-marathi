@@ -13,6 +13,24 @@ export const siteConfig = {
     "श्रीमद्भगवद्गीतेचे सर्व अध्याय आणि श्लोक मराठीत — शब्दार्थ, भावार्थ, सोपे स्पष्टीकरण आणि संस्कृत उच्चारासह. आपली प्रगती नोंदवा आणि नियमित अभ्यास करा.",
 } as const;
 
+/**
+ * Source attribution. The entire scripture content is based on the Bhagavad
+ * Gita As It Is by His Divine Grace A.C. Bhaktivedanta Swami Prabhupāda,
+ * Founder-Ācārya of ISKCON. His full name is always used wherever referenced.
+ */
+export const attribution = {
+  /** Full honorific name, Marathi. */
+  authorMarathi:
+    "हिज डिव्हाईन ग्रेस ए. सी. भक्तिवेदान्त स्वामी प्रभुपाद",
+  /** Full honorific name, English. */
+  authorEnglish:
+    "His Divine Grace A.C. Bhaktivedanta Swami Prabhupāda",
+  /** The source work, Marathi. */
+  workMarathi: "भगवद्गीता जशी आहे तशी",
+  /** The source work, English. */
+  workEnglish: "Bhagavad-gītā As It Is",
+} as const;
+
 /** Primary navigation for a signed-in learner. */
 export const learnerNav = [
   { href: "/dashboard", labelMarathi: "मुख्यपृष्ठ", labelEnglish: "Dashboard" },

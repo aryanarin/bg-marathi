@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Headphones, LineChart, NotebookPen } from "lucide-react";
 
@@ -5,7 +6,7 @@ import { Container } from "@/components/layout/container";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/site-config";
+import { attribution, siteConfig } from "@/lib/site-config";
 
 const features = [
   {
@@ -53,12 +54,14 @@ export default function HomePage() {
             carry the devotional tone on their own. */}
         <section className="border-b border-rule bg-surface/40">
           <Container width="default" className="py-14 text-center sm:py-20">
-            <p
-              aria-hidden="true"
-              className="mb-5 font-verse text-3xl leading-none text-accent"
-            >
-              ॐ
-            </p>
+            <Image
+              src="/images/logo-mark.png"
+              alt=""
+              width={96}
+              height={96}
+              priority
+              className="mx-auto mb-5 size-20 rounded-full sm:size-24"
+            />
 
             <h1 className="font-devanagari text-3xl leading-tight text-ink sm:text-4xl">
               {siteConfig.name}
@@ -118,6 +121,12 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
+
+            <p className="mx-auto mt-10 max-w-reading text-center text-sm leading-relaxed text-ink-subtle prose-marathi">
+              या संकेतस्थळावरील संपूर्ण मजकूर {attribution.authorMarathi} यांच्या{" "}
+              <span className="italic">{attribution.workMarathi}</span> या
+              ग्रंथावर आधारित आहे.
+            </p>
           </Container>
         </section>
       </main>

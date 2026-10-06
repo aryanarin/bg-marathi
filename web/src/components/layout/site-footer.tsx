@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
-import { siteConfig } from "@/lib/site-config";
+import { attribution, siteConfig } from "@/lib/site-config";
 
 export function SiteFooter() {
   return (
@@ -26,9 +26,10 @@ export function SiteFooter() {
         </div>
 
         <p className="mt-6 text-xs leading-relaxed text-ink-subtle">
-          श्लोक, भाषांतर आणि भावार्थ श्रील प्रभुपादांच्या
-          <span className="italic"> भगवद्गीता जशी आहे तशी </span>
-          या ग्रंथावर आधारित आहेत.
+          या संकेतस्थळावरील संपूर्ण मजकूर — श्लोक, भाषांतर आणि भावार्थ —{" "}
+          {attribution.authorMarathi} यांच्या
+          <span className="italic"> {attribution.workMarathi} </span>
+          या ग्रंथावर आधारित आहे.
         </p>
       </Container>
     </footer>
