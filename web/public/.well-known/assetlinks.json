@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "eu.org.bhakti.gita",
+      "sha256_cert_fingerprints": [
+        "DF:D3:7A:BE:D8:F4:BA:29:CF:31:53:46:86:5E:33:2D:29:C1:49:4C:44:A3:07:B0:75:CD:2A:16:9E:FF:B9:59"
+      ]
+    }
+  }
+]
