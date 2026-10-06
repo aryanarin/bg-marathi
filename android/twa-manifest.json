@@ -1,0 +1,43 @@
+{
+  "packageId": "eu.org.bhakti.gita",
+  "host": "gita.bhakti.eu.org",
+  "name": "श्रीमद्भगवद्गीता",
+  "launcherName": "भगवद्गीता",
+  "display": "standalone",
+  "themeColor": "#fdfbf7",
+  "themeColorDark": "#16181d",
+  "navigationColor": "#fdfbf7",
+  "navigationColorDark": "#16181d",
+  "navigationDividerColor": "#fdfbf7",
+  "navigationDividerColorDark": "#16181d",
+  "backgroundColor": "#fdfbf7",
+  "enableNotifications": false,
+  "startUrl": "/dashboard",
+  "iconUrl": "https://gita.bhakti.eu.org/images/icon-512.png",
+  "maskableIconUrl": "https://gita.bhakti.eu.org/images/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "gita"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://gita.bhakti.eu.org/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://gita.bhakti.eu.org/",
+  "minSdkVersion": 23,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersion": "1.0.0"
+}

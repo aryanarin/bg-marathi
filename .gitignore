@@ -74,3 +74,6 @@ vedabase_audio_analysis.txt
 # Large extraction intermediates (regenerable).
 content/decoded.md
 logo/
+
+# Build artifacts (APK/AAB) — distributed outside git.
+dist/

@@ -1,0 +1,62 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'eu.org.bhakti.gita'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "eu.org.bhakti.gita"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        // The web origin this TWA is bound to.
+        def hostName = "gita.bhakti.eu.org"
+        def launchUrl = "/dashboard"
+
+        manifestPlaceholders = [
+                hostName         : hostName,
+                defaultUrl       : "https://${hostName}${launchUrl}",
+                launchUrl        : launchUrl,
+                launcherName     : "भगवद्गीता",
+                hostNameEscaped  : hostName.replace(".", "\\."),
+        ]
+
+        resValue "string", "app_name", "भगवद्गीता"
+        resValue "string", "launcher_name", "भगवद्गीता"
+        resValue "string", "twa_url", "https://${hostName}${launchUrl}"
+        resValue "string", "host_name", hostName
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("../android.keystore")
+            storePassword "gita2026"
+            keyAlias "gita"
+            keyPassword "gita2026"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

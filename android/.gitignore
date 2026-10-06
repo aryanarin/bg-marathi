@@ -1,0 +1,12 @@
+# Android build output
+build/
+.gradle/
+local.properties
+
+# Signing key — NEVER commit. Keep backed up separately.
+*.keystore
+*.jks
+
+# Bubblewrap intermediates
+icon.png
+icon-maskable.png
