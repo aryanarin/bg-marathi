@@ -17,7 +17,7 @@ export function AuthHeader({ subtitle }: { subtitle: string }) {
   return (
     <View style={{ alignItems: "center", marginBottom: 28 }}>
       <Image
-        source={require("../../../assets/icon.png")}
+        source={require("../../assets/icon.png")}
         style={{ width: 72, height: 72, borderRadius: 36, marginBottom: 12 }}
       />
       <Text
