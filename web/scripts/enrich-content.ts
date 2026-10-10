@@ -154,26 +154,32 @@ function cleanMarathi(text: string | null | undefined, chapterName?: string): st
   return t;
 }
 
-async function main() {
-  const arg = process.argv[2];
-  if (!arg) {
-    console.error(`${RED}Usage:${RESET} npm run content:enrich -- 1`);
-    process.exit(1);
+async function enrichChapter(chapter: number): Promise<void> {
+  // Marathi source: prefer the OCR extraction (clean, readable Marathi), fall
+  // back to the Chanakya draft. The OCR file has one entry per verse number.
+  const nn2 = String(chapter).padStart(2, "0");
+  const ocrPath = path.join(CONTENT_DIR, `chapter-${nn2}.ocr.json`);
+  const draftPath = path.join(CONTENT_DIR, `chapter-${nn2}.draft.json`);
+  let source: ChapterJson;
+  let sourceKind: string;
+  try {
+    source = JSON.parse(readFileSync(ocrPath, "utf8"));
+    sourceKind = "OCR";
+  } catch {
+    source = JSON.parse(readFileSync(draftPath, "utf8"));
+    sourceKind = "Chanakya draft";
   }
-  const chapter = Number(arg);
-
-  // Load the draft produced by the PDF extractor.
-  const draftPath = path.join(CONTENT_DIR, `chapter-${String(chapter).padStart(2, "0")}.draft.json`);
-  const draft: ChapterJson = JSON.parse(readFileSync(draftPath, "utf8"));
+  console.log(`${DIM}Marathi source: ${sourceKind}${RESET}`);
 
   console.log(`${DIM}Fetching vedabase structure for chapter ${chapter}…${RESET}`);
   const groups = await getGroups(chapter);
   console.log(`${DIM}${groups.length} verse groups (combined: ${groups.filter((g) => g.end !== g.start).map((g) => g.slug).join(", ") || "none"})${RESET}\n`);
 
-  // Index the draft's Marathi by starting verse number for lookup.
-  const draftByStart = new Map<number, VerseJson>();
-  for (const v of draft.verses) draftByStart.set(v.verse_number, v);
+  // Index source Marathi by verse number for lookup.
+  const srcByNum = new Map<number, VerseJson>();
+  for (const v of source.verses) srcByNum.set(v.verse_number, v);
 
+  const chapterName = source.name_sanskrit;
   const enriched: VerseJson[] = [];
   let shlokaFixed = 0;
   const flags: string[] = [];
@@ -181,12 +187,21 @@ async function main() {
   for (const g of groups) {
     const shloka = await getDevanagari(chapter, g.slug);
 
-    // Find the matching draft verse (by start number).
-    const d = draftByStart.get(g.start);
+    // For a combined group (e.g. 16-18), the OCR commentary lives under the
+    // group's starting verse; the member verses (17, 18) usually hold only the
+    // shloka tail. Merge any non-empty fields across the group's members.
+    const members: VerseJson[] = [];
+    for (let n = g.start; n <= g.end; n++) {
+      const m = srcByNum.get(n);
+      if (m) members.push(m);
+    }
+    const pick = (field: "word_to_word" | "translation" | "purport") =>
+      members.map((m) => m[field] ?? "").filter((s) => s && s.trim()).join("\n\n");
 
-    const w2w = cleanMarathi(d?.word_to_word, draft.name_sanskrit);
-    const translation = cleanMarathi(d?.translation, draft.name_sanskrit);
-    const purport = cleanMarathi(d?.purport, draft.name_sanskrit);
+    const w2w = cleanMarathi(pick("word_to_word"), chapterName);
+    const translation = cleanMarathi(pick("translation"), chapterName);
+    const purport = cleanMarathi(pick("purport"), chapterName);
+    const d = srcByNum.get(g.start);
 
     if (shloka) shlokaFixed++;
 
@@ -222,9 +237,11 @@ async function main() {
 
   const out: ChapterJson = {
     chapter_number: chapter,
-    name_sanskrit: draft.name_sanskrit,
-    name_marathi: draft.name_marathi,
-    description: draft.description ?? "",
+    name_sanskrit: chapterName,
+    // The OCR source carries only name_sanskrit; keep name_marathi equal to it
+    // unless the source provided one. The admin can refine chapter names in-app.
+    name_marathi: source.name_marathi ?? chapterName,
+    description: source.description ?? "",
     verses: enriched,
   };
 
@@ -234,8 +251,23 @@ async function main() {
   console.log(`\n${GREEN}Wrote ${path.basename(outPath)}${RESET}`);
   console.log(`  verses: ${enriched.length}  shlokas replaced from vedabase: ${shlokaFixed}`);
   console.log(`  ${YELLOW}review flags: ${flags.length}${RESET}`);
-  for (const f of flags.slice(0, 20)) console.log(`    - ${f}`);
-  if (flags.length > 20) console.log(`    … and ${flags.length - 20} more`);
+  for (const f of flags.slice(0, 10)) console.log(`    - ${f}`);
+  if (flags.length > 10) console.log(`    … and ${flags.length - 10} more`);
+}
+
+async function main() {
+  const arg = process.argv[2];
+  if (!arg) {
+    console.error(`${RED}Usage:${RESET} npm run content:enrich -- 1 | all`);
+    process.exit(1);
+  }
+  const chapters = arg.toLowerCase() === "all"
+    ? Array.from({ length: 18 }, (_, i) => i + 1)
+    : [Number(arg)];
+  for (const ch of chapters) {
+    console.log(`\n${DIM}======== Chapter ${ch} ========${RESET}`);
+    await enrichChapter(ch);
+  }
 }
 
 main().catch((err) => {
