@@ -36,6 +36,17 @@ export const verseContentSchema = z
       .min(1, "verse_number must be 1 or greater"),
 
     /**
+     * Last verse number for a combined entry (e.g. 16-18 -> end 18). Null/absent
+     * for a single verse. Bhagavad-gita As It Is groups some verses under one
+     * commentary, and the recitation audio treats each group as one track.
+     */
+    verse_number_end: z
+      .number()
+      .int("verse_number_end must be an integer")
+      .min(1)
+      .nullish(),
+
+    /**
      * Sanskrit verse text. Must actually contain Devanagari characters: a
      * transliterated or English-only value here is a content error, not a
      * stylistic choice.

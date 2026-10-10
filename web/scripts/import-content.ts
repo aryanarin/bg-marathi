@@ -153,9 +153,24 @@ async function importOne(supabase: Db, file: string, dryRun: boolean): Promise<v
     }
   }
 
+  // Reconcile: delete any existing verse in this chapter whose verse_number is
+  // NOT a group start in the file being imported. This removes orphans left
+  // behind when a re-import regroups verses — e.g. switching from 46 standalone
+  // rows to grouped entries (16-18) leaves stale rows for 17 and 18 otherwise.
+  const keep = new Set(chapter.verses.map((v) => v.verse_number));
+  const { data: existing } = await supabase
+    .from("verses")
+    .select("id, verse_number")
+    .eq("chapter_id", chapterRow.id);
+  const orphans = (existing ?? []).filter((r) => !keep.has(r.verse_number));
+  for (const o of orphans) {
+    await supabase.from("verses").delete().eq("id", o.id);
+  }
+
   const tag = isDraft ? `${YELLOW}draft${RESET}` : `${GREEN}final${RESET}`;
+  const orphanNote = orphans.length ? `, ${orphans.length} orphan(s) removed` : "";
   console.log(
-    `${GREEN}ch ${String(chapter.chapter_number).padStart(2, "0")}${RESET}: ${ok}/${chapter.verses.length} verses (${tag}, ${markers} markers)`,
+    `${GREEN}ch ${String(chapter.chapter_number).padStart(2, "0")}${RESET}: ${ok}/${chapter.verses.length} verses (${tag}, ${markers} markers${orphanNote})`,
   );
 }
 
