@@ -56,9 +56,15 @@ export const verseContentSchema = z
       "sanskrit_text must contain Devanagari characters",
     ),
 
-    word_to_word: nonEmptyText("word_to_word"),
-    translation: nonEmptyText("translation"),
-    purport: nonEmptyText("purport"),
+    // word_to_word / translation / purport are usually present, but Bhagavad-
+    // gita As It Is legitimately shares one commentary across a run of grouped
+    // verses (e.g. the warrior-list verses 1.5-7), leaving members with no
+    // separate text. So these are nullable: null/absent means "no separate
+    // text for this verse", which the verse page simply omits. A present value
+    // must still be non-empty (no whitespace-only or placeholder junk).
+    word_to_word: nonEmptyText("word_to_word").nullish(),
+    translation: nonEmptyText("translation").nullish(),
+    purport: nonEmptyText("purport").nullish(),
 
     /** Administrator-authored. Optional. Never generated. */
     easy_explanation: z.string().nullish(),

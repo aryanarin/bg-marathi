@@ -38,7 +38,9 @@ CHAPTER_ORDINALS = [
     ["तेरावा"], ["चौदावा"], ["पंधरावा"], ["सोळावा"], ["सतरावा"], ["अठरावा"],
 ]
 
-DANDA_NUM = re.compile(r"॥\s*([०-९]+)\s*॥")
+# Verse-end marker "॥ N॥". OCR sometimes inserts stray dandas/spaces between the
+# opening ॥ and the number (e.g. "॥। ७॥"), so tolerate leading । and whitespace.
+DANDA_NUM = re.compile(r"॥[।\s]*([०-९]+)\s*[।\s]*॥")
 DEV = {d: i for i, d in enumerate("०१२३४५६७८९")}
 
 
@@ -67,6 +69,9 @@ FURNITURE = [
 
 
 def strip_furniture(text: str, chapter_name: str | None) -> str:
+    # Page-break markers injected by the OCR cache (@@@PAGE N@@@), with or
+    # without a page number. These sit mid-text wherever a verse spans pages.
+    text = re.sub(r"@@@\s*PAGE[^@]*@@@", " ", text)
     for pat in FURNITURE:
         text = pat.sub(" ", text)
     if chapter_name:
@@ -106,15 +111,49 @@ def split_commentary(block: str, chapter_name: str) -> tuple[str, str, str]:
         pre = block
     pre = strip_furniture(pre, chapter_name)
 
-    # The word gloss is the run of "term-- meaning;" pairs. OCR renders the dash
-    # as --, <-, —, or -. The translation is the trailing sentence after the
-    # last ';' that has no gloss dash. Heuristic: split at the last ';'.
-    if ";" in pre:
-        last_semi = pre.rfind(";")
-        w2w = pre[: last_semi + 1].strip()
-        translation = pre[last_semi + 1 :].strip()
+    # Structure of `pre`:  term--meaning; term--meaning; ... ; LASTterm--meaning. TRANSLATION
+    # The gloss units are ';'-separated; the FINAL unit ends in '.' (no ';');
+    # the translation is a sentence with no ';'. So the gloss list ends at the
+    # LAST ';'. The piece after it is "<final-gloss-meaning>. <translation>".
+    #
+    # We split at the last ';', then within the tail, the final gloss ends at
+    # the first sentence terminator AFTER its gloss dash (--, —, <-). The rest is
+    # the translation. This is robust even when the translation prose itself
+    # contains '--' (e.g. "आत्म--साक्षात्कार"), because we only look at the tail
+    # that follows the last ';', and only up to the final gloss's own period.
+    GLOSS_DASH = re.compile(r"--|—|<-")
+    semi = pre.rfind(";")
+    if semi != -1:
+        head = pre[: semi + 1]            # all gloss units except the last
+        tail = pre[semi + 1 :]            # "<final gloss>. <translation>"
+        dash = GLOSS_DASH.search(tail)
+        if dash:
+            term = re.search(r"[.?।]", tail[dash.end():])
+            if term:
+                cut = dash.end() + term.end()
+                final_gloss = tail[:cut]
+                translation = tail[cut:].strip()
+                w2w = (head + final_gloss).strip()
+            else:
+                # Final gloss has no terminator; treat whole tail as gloss.
+                w2w = pre.strip()
+        else:
+            # Tail has no gloss dash -> it is purely translation.
+            w2w = head.strip()
+            translation = tail.strip()
+    elif GLOSS_DASH.search(pre):
+        # No ';' but has a gloss dash: single gloss then translation.
+        dash = GLOSS_DASH.search(pre)
+        term = re.search(r"[.?।]", pre[dash.end():])
+        if term:
+            cut = dash.end() + term.end()
+            w2w = pre[:cut].strip()
+            translation = pre[cut:].strip()
+        else:
+            w2w = pre.strip()
     else:
-        translation = pre
+        # No gloss markers at all: whole block is translation.
+        translation = pre.strip()
     return w2w, translation, purport
 
 

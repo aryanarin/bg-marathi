@@ -130,12 +130,19 @@ async function getDevanagari(chapter: number, slug: string): Promise<string> {
 
 
 
-/** Remove page furniture and decode markers from a Marathi field. */
+/**
+ * Remove page furniture and decode markers from a Marathi field. This is the
+ * FINAL cleaning step before content is written, so it is defensive: it strips
+ * every artifact seen in the OCR text regardless of what earlier steps did.
+ */
 function cleanMarathi(text: string | null | undefined, chapterName?: string): string {
   if (!text) return "";
   let t = text;
-  // Running header "भगवद्गीता जशी आहे तशी".
-  t = t.replace(/भगवद्गीता[^\n]{0,25}जशी आहे तशी/g, " ");
+  // OCR cache page-break markers ("@@@PAGE N@@@" / "@@@PAGE @@@"), which land
+  // mid-text wherever a verse spans a page.
+  t = t.replace(/@@@\s*PAGE[^@]*@@@/g, " ");
+  // Running header "भगवद्गीता जशी आहे तशी" (OCR may insert a ZWJ in भगवद्गीता).
+  t = t.replace(/भगवद्\u200c?गीता[^\n]{0,25}जशी आहे तशी/g, " ");
   // Chapter labels: "अध्याय १" and "श्लोक ३" page markers.
   t = t.replace(/अध्याय\s*[०-९\d]+/g, " ");
   t = t.replace(/श्लोक\s*[०-९\d]+/g, " ");
@@ -149,8 +156,9 @@ function cleanMarathi(text: string | null | undefined, chapterName?: string): st
   // Leftover decode markers.
   t = t.replace(/\[\?\]/g, "");
   t = t.replace(/\[पुनरावलोकन आवश्यक\]/g, "");
-  // Tidy whitespace.
-  t = t.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  // Tidy whitespace: collapse runs of spaces, strip space before punctuation,
+  // and limit blank lines.
+  t = t.replace(/[ \t]+/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   return t;
 }
 
@@ -222,9 +230,12 @@ async function enrichChapter(chapter: number): Promise<void> {
       verse_number: g.start,
       verse_number_end: g.end !== g.start ? g.end : null,
       sanskrit_text: shloka,
-      word_to_word: w2w || "[पुनरावलोकन आवश्यक]",
-      translation: translation || "[पुनरावलोकन आवश्यक]",
-      purport: purport || "[पुनरावलोकन आवश्यक]",
+      // Genuinely-empty fields are stored null (not a visible placeholder):
+      // the verse page omits empty sections, and in this edition some grouped
+      // verses legitimately have no separate text.
+      word_to_word: w2w || null,
+      translation: translation || null,
+      purport: purport || null,
       easy_explanation: d?.easy_explanation ?? "",
       example: d?.example ?? "",
       audio_url: `https://mjavrqbierktlafrkoxu.supabase.co/storage/v1/object/public/verse-audio/${cc}/${audioName}`,
